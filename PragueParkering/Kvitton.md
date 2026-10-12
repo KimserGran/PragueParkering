@@ -1,9 +1,9 @@
 ## Parkeringskvitto
 
-- Plats: 20
+- Plats: 10
 - Fordon: Bil
-- Registreringsnummer:1234445
-- Starttid: OKTOBER-ONSDAG-15:19
+- Registreringsnummer:123
+- Starttid: OKTOBER-MÅNDAG-08:25
 
 ---
 

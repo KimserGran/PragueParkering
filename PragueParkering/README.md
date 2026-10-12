@@ -66,6 +66,33 @@ rensade och fixade en metod för selection prompts.
 allt ser bra ut.
 
 
+## ----------------------------- ## PERSONLIG REFLEKTION
+1.Jag började uppgiften med måtlig säkerhet och dag efter dag kom det fram mer självsäkerhet.
+	började skriva metoder jag antog jag behöver och sen var det att börja, vilket jag började med arrayen.
+	sen var det att börja bygga metoderna för att sätta in första fordonet.
+	Jag kände mig väldigt stolt sen när jag fixade en visuelisering för parkerings huset, såg riktigt bra ut också.
+	Personligen stötte jag på några få "väghinder" så att säga, jag fick lite stökig logik när jag skulle optimera eller parkera ibland.
+	Utöver det så flöt kodningen på bra, jag tog lite extra tid på mig för att jag var överflödig inom projektet men det var mitt val,
+	jag måste vara försiktig med det så att jag inte skapar en vana att bygga mer än vad som frågat.
+
+2.Jag löste det i slutändan ganska bra för att jag kände mig mer och mer säker när jag skrev, jag kunde läsa min kod och förstå den bra.
+	min kod gjorde i slutändan vad jag ville och nu kan man enkelt flytta runt menyer utan problem så det i sig självt är bevis på att allt funkar.
+
+3.Det största problemet jag hade under denna uppgift var en blandning av logik och att skifta mellan plats (1-100) och index (0-99), 
+	jag stötte på ett problem med att jag först ibland ersätte fordon som redan var parkerade, MC fordon jag hade samlade och optimerades inte.
+	MEN, jag löste det!, i stunden är jag osäker vad själva felet var men är 100% säker på att det var ett logik fel, kan ett kombinerat fel i både Optimerings metoden samt HittaParkering metoden
+	Jag löste det steg vis genom att skapa brytplatser och hålla koll på vart värden samt plats värde gick fel.
+
+4.Som sagt var jag lite överflödig i mitt program för ett skoluppgift och gick ett steg längre,
+	metoderna som behövdes för att lösa uppgiften finns alla med känner jag, men absolut kunde jag ha dubblat antalet metoder och separerat vad dom gör ännu mer. kände att jag hittade en ok balans
+
+5.Om jag skulle göra om uppgiften igen skulle jag bygga på ett mycket mer stegvis sätt, gärna från antigen botten up eller toppen ner, båda funkar. 
+	Jag fick lite A.D.D ibland under uppgiften när jag fick en idé och började bygga nya metoder, detta gjorde i början projektet lite stökigt.
+
+6.Slutsats hemuppgift: en kul och väldigt intressant uppgift fokuserade på många olika delar vi gått igenom 
+	visa saker var tuffare som när jag fastnade på logiken men generellt var det en väldigt balanserad uppgift.
+
+7.Slutsats kurs: Kursen i helhet än så länge känns väldigt bra, men denna uppgift är egentligen en väldigt liten del av c# programmering
 
 
 
@@ -76,7 +103,9 @@ allt ser bra ut.
 
 
 
-## ----------------------------- ## AI SUMMARY
+
+
+## ----------------------------- ## AI SUMMARY // BARA FÖR SKOJS SKULL!
 
 **PragueParkering** är ett console-baserat parkeringsgaraget-system byggt i .NET 10 med Spectre.Console för användargränssnittet. 
 

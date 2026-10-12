@@ -22,7 +22,7 @@ namespace PragueParkering
             while (true)
             {
                 Console.Clear();
-                var menyVal = PromptSelectionMedVal("[bold underline]Välkommen till Garaget, Vad vill du göra?[/]", ["Lediga Parkeringsplatser", "Boka nytt fordon", "Hämta ut fordon", "Admin och tester", "Avsluta"]);
+                var menyVal = PromptSelectionMedVal("[bold underline]Välkommen till Garaget, Vad vill du göra?[/]", ["Lediga Parkeringsplatser", "Boka nytt fordon", "Hämta ut fordon","Flytta Fordon", "Admin och tester", "Avsluta"]);
 
                 switch (menyVal)
                 {
@@ -34,6 +34,9 @@ namespace PragueParkering
                         break;
                     case "Hämta ut fordon":
                         UthämtningsMeny(null);
+                        break;
+                    case "Flytta Fordon":
+                        FlyttaFordonsMeny();
                         break;
                     case "Admin och tester":
                         AdminMeny();
