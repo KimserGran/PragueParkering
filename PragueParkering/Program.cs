@@ -113,13 +113,46 @@ namespace PragueParkering
             Console.WriteLine("Här kan du hämta ut ditt fordon\n Vänligen identifiera ditt fordon\n");
             Console.WriteLine("Vad är ditt register?");
             string reg = Console.ReadLine().ToUpper();
-            string fordon = HämtaFordonOmDetStämmer(reg);
-            if (fordon == string.Empty)
+            int index = Array.FindIndex(ParkeringsGaragePlatser, p => p != null && p.Contains(reg));
+            if (index == -1)
             {
-                Console.WriteLine("Något gick fel, återgår till menyn");
+                Console.WriteLine("Fel register, tryck valfri knapp för att fortsätta");
+                Console.ReadKey(true);
                 return;
             }
-            else ParkeringsGaragePlatser.Replace(fordon, null);
+            else
+            {
+                if (PreSplit(ParkeringsGaragePlatser[index], "fordon") == "Bil")
+                {
+                    ParkeringsGaragePlatser[index] = null;
+                }
+                else
+                {
+                    if (ParkeringsGaragePlatser[index].Contains('|'))
+                    {
+                        string fordon = PreSplit(ParkeringsGaragePlatser[index], "fordon");
+                        string tid = PreSplit(ParkeringsGaragePlatser[index], "tid på två mc");
+                        string tvåMc = PreSplit(ParkeringsGaragePlatser[index], "register två mc");
+
+                        string[] deladMc = tvåMc.Split('|');
+                        string[] deladTid = tid.Split('|');
+                        ParkeringsGaragePlatser[index] = null;
+                        if (deladMc[0].Contains(reg))
+                        {
+                            NyttFordonIArray(index + 1, fordon, deladMc[1], deladTid[1]);
+                        }
+                        else if(deladMc[0].Contains(reg))
+                        {
+                            NyttFordonIArray(index + 1, fordon, deladMc[0], deladTid[0]);
+                        }
+                    }
+                    else ParkeringsGaragePlatser[index] = null;
+                }
+            }
+            Console.WriteLine("Fordon uttaget!");
+            Console.ReadKey(true);
+            return;
+
         }
         static void AdminMeny()//sub-meny gjord för att kunna göra olika tester eller admin-saker
         {
@@ -371,6 +404,10 @@ namespace PragueParkering
             string[] delar = fullString.Split('#');
             switch (del.ToLower())
             {
+                case "tid på två mc":
+                    return delar[3];
+                case "register två mc":
+                    return delar[2];
                 case "plats":
                     return delar[0];
                 case "fordon":
@@ -401,30 +438,6 @@ namespace PragueParkering
                     }
             }
             return "FEL I FORDONSPLIT";
-        }
-        static string HelaFordonEllerSplittadDel(string fullString, string del, string register) //Tar ett en hel sträng för ett komplett fordon och delar upp det sen returnerar det användaren vill ha.
-        {
-            int plats = int.Parse(HelaFordonEllerSplittadDel(fullString, "plats"));
-            string mcA = string.Empty;
-            string mcB = string.Empty;
-            string[] deladMC = fullString.Split('|');
-            if (del == "separera mc")
-            {
-                foreach (var s in deladMC)
-                {
-                    if (s.Contains(register))
-                    {
-                        mcA = s;
-                    }
-                    else if (!s.Contains(register))
-                    {
-                        mcB = s;
-                    }
-                }
-                ParkeringsGaragePlatser[plats] = mcB;
-                return mcA;
-            }
-            return string.Empty;
         }
         static int HittaParkering(int plats, string fordon)// Kollar på parkering åt bil eller mc, mc som ska kombineras får +1000 för identifiering 
         {
@@ -504,47 +517,6 @@ namespace PragueParkering
 
             }
         }
-        static string HämtaFordonOmDetStämmer(string register) // meny för att kolla fordon
-        {
-            if (string.IsNullOrWhiteSpace(register) || register.Contains(" "))
-            {
-                //Switch som jämför ditt val samt data med aktiv data
-                string val = PromptSelectionMedVal("Ditt register var inte giltigt eller null, Vill du försöka igen?", ["Ja", "Nej"]);
-                switch (val)
-                {
-                    case "Ja":
-                        Console.Clear();
-                        while (true)
-                        {
-                            Console.WriteLine("Skriv ditt register");
-                            register = Console.ReadLine();
-                            if (register != null && register.Length < 10)
-                                break;
-                            else if (register == string.Empty)
-                                return string.Empty;
-                            Console.WriteLine("Fel inmatning max 10 tecken, Lämna tomt för gå tillbaka");
-                        }
-                        break;
-                    case "Nej":
-                        Console.Clear();
-                        return string.Empty;
-                }
-            }
-            else if (register != null)
-            {
-
-                int index = Array.FindIndex(ParkeringsGaragePlatser, p => p != null && p.Contains(register));
-                if (index == -1)
-                    return string.Empty;
-                string? fordon = HämtaFordonOmDetStämmer(index + 1);
-                if (fordon.Contains("|"))
-                {
-                    fordon = PreSplit(fordon, "ta ut specifik mc", register);
-                }
-                return fordon;
-            }
-            return string.Empty;
-        }
         static string HämtaFordonOmDetStämmer(int plats) // Hämta fordon via plats# 
         {
             if (ParkeringsGaragePlatser[plats - 1] == null)
@@ -613,12 +585,6 @@ namespace PragueParkering
             {
                 return string.Empty;
             }
-        }
-
-        static string PreSplit(string fullString, string del, string register) // gjordes för att hitta fel under krasch men jag tror den är onödig.
-        {
-            string a = HelaFordonEllerSplittadDel(fullString, del, register);
-            return a;
         }
         static void FlyttaMellanTvåPlatser(int plats1, int plats2, string fordon)//flyttar ett fordon till en ny plats
         {
