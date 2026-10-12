@@ -22,7 +22,7 @@ namespace PragueParkering
             while (true)
             {
                 Console.Clear();
-                var menyVal = PromptSelectionMedVal("[bold underline]Välkommen till Garaget, Vad vill du göra?[/]", ["Lediga Parkeringsplatser", "Boka nytt fordon", "Hämta ut fordon","Flytta Fordon", "Admin och tester", "Avsluta"]);
+                var menyVal = PromptSelectionMedVal("[bold underline]Välkommen till Garaget, Vad vill du göra?[/]", ["Lediga Parkeringsplatser", "Boka nytt fordon", "Hämta ut fordon", "Flytta Fordon", "Admin och tester", "Avsluta"]);
 
                 switch (menyVal)
                 {
@@ -33,7 +33,7 @@ namespace PragueParkering
                         BokaFordonsMeny();
                         break;
                     case "Hämta ut fordon":
-                        UthämtningsMeny(null);
+                        UthämtningsMeny();
                         break;
                     case "Flytta Fordon":
                         FlyttaFordonsMeny();
@@ -82,7 +82,7 @@ namespace PragueParkering
                     Console.WriteLine("Röda = upptaget, grön = ledig, gul = finns plats för en extra MC.\nAnge önskad plats.");
                     while (!int.TryParse(Console.ReadLine(), out plats) || plats < 1 || plats > 100)
                         Console.WriteLine("Fel inmatning eller ogiltig plats, försök igen");
-                    HittaParkering(plats, fordon);
+                    plats = HittaParkering(plats, fordon);
                     break;
                 case "Automatiskt tilldelad":
                     plats = HittaParkering(fordon);
@@ -93,14 +93,14 @@ namespace PragueParkering
             {
                 pPlats = plats - 1000;
             }
-            pPlats = plats;
+            else pPlats = plats;
             Console.Clear();
             string slutVal = PromptSelectionMedVal($"[bold underline]Din parkerings plats blir {(pPlats)}[/]\n\nDitt fordons info är:\nFordon: \t{fordon}\nRegister: \t{register}\nStart tid: \t{tid}\nStämmer det?", ["Ja", "Nej"]);
             switch (slutVal)
             {
                 case "Ja":
                     Console.WriteLine("Ett kvitto skrivs ut!");
-                    SkrivKvitto(plats, fordon, register, tid);
+                    SkrivKvitto(pPlats, fordon, register, tid);
                     NyttFordonIArray(plats, fordon, register, tid);
                     break;
                 case "Nej":
@@ -108,15 +108,17 @@ namespace PragueParkering
 
             }
         }
-        static void UthämtningsMeny(string implicitString)// Gjord hämta ut/ta bort fordon om dom identifieras rätt.
+        static void UthämtningsMeny()// Gjord hämta ut/ta bort fordon om dom identifieras rätt.
         {
             Console.WriteLine("Här kan du hämta ut ditt fordon\n Vänligen identifiera ditt fordon\n");
             Console.WriteLine("Vad är ditt register?");
-
-            implicitString = Console.ReadLine();
-            string fordon = HämtaFordonOmDetStämmer(implicitString);
+            string reg = Console.ReadLine().ToUpper();
+            string fordon = HämtaFordonOmDetStämmer(reg);
             if (fordon == string.Empty)
+            {
+                Console.WriteLine("Något gick fel, återgår till menyn");
                 return;
+            }
             else ParkeringsGaragePlatser.Replace(fordon, null);
         }
         static void AdminMeny()//sub-meny gjord för att kunna göra olika tester eller admin-saker
@@ -166,10 +168,10 @@ namespace PragueParkering
                     int val2;
                     while (!int.TryParse(Console.ReadLine(), out val2) || val2 < 1 || val2 > 100)
                         Console.WriteLine("Felaktig plats, ange plats mellan 1-100");
-                    if (HelaFordonEllerSplittadDel(fordon, "fordon") == "MC")
+                    if (PreSplit(fordon, "fordon") == "MC")
                     {
                         string optimeradMC;
-                        if (ParkeringsGaragePlatser[val2 - 1] != null && HelaFordonEllerSplittadDel(ParkeringsGaragePlatser[val2 - 1], "fordon") == "MC" && !ParkeringsGaragePlatser[val2 - 1].Contains("|"))
+                        if (ParkeringsGaragePlatser[val2 - 1] != null && PreSplit(ParkeringsGaragePlatser[val2 - 1], "fordon") == "MC" && !ParkeringsGaragePlatser[val2 - 1].Contains("|"))
                         {
                             optimeradMC = Optimering(ParkeringsGaragePlatser[val1 - 1], val2);
                             FlyttaMellanTvåPlatser(val1, val2, optimeradMC);
@@ -179,7 +181,7 @@ namespace PragueParkering
                         else Console.WriteLine("Platsen är full");
                         break;
                     }
-                    if (HelaFordonEllerSplittadDel(fordon, "fordon") == "Bil")
+                    if (PreSplit(fordon, "fordon") == "Bil")
                     {
                         if (ParkeringsGaragePlatser[val2 - 1] == null)
                             FlyttaMellanTvåPlatser(val1, val2, fordon);
@@ -215,46 +217,6 @@ namespace PragueParkering
                         return;
                 }
             }
-        }
-        static string HämtaFordonOmDetStämmer(string register) // meny för att kolla fordon
-        {
-            if (string.IsNullOrWhiteSpace(register) || register.Contains(" "))
-            {
-                string val = PromptSelectionMedVal("Ditt register var inte giltigt eller null, Vill du försöka igen?", ["Ja", "Nej"]);
-                switch (val)
-                {
-                    case "Ja":
-                        Console.Clear();
-                        while (true)
-                        {
-                            Console.WriteLine("Skriv ditt register");
-                            register = Console.ReadLine();
-                            if (register != null && register.Length < 10)
-                                break;
-                            else if (register == string.Empty)
-                                return string.Empty;
-                            Console.WriteLine("Fel inmatning max 10 tecken, Lämna tomt för gå tillbaka");
-                        }
-                        break;
-                    case "Nej":
-                        Console.Clear();
-                        return string.Empty;
-                }
-            }
-            else if (register != null)
-            {
-
-                int index = Array.FindIndex(ParkeringsGaragePlatser, p => p != null && p.Contains(register));
-                if (index == -1)
-                    return string.Empty;
-                string? fordon = HämtaFordonOmDetStämmer(index);
-                if (fordon.Contains("|"))
-                {
-                    fordon = PreSplit(fordon, "separera fordon");
-                }
-                return fordon;
-            }
-            return string.Empty;
         }
         static void StängningsMeny()//en meny för att stänga parkeringshuset. inte automatisk
         {
@@ -409,21 +371,6 @@ namespace PragueParkering
             string[] delar = fullString.Split('#');
             switch (del.ToLower())
             {
-                case "separera mc":
-                    string val1 = PromptSelectionMedVal("Parkeringen har 2st MC'xPlats parkerade, vill du ha fordon #1/#2?", ["#1", "#2"]);
-                    string[] deladMC = fullString.Split('|');
-                    switch (val1.ToLower())
-                    {
-                        case "#1":
-                            return deladMC[0];
-                        case "#2":
-                            return deladMC[1];
-                        case "tillbaka":
-                            MainMeny();
-                            break;
-                    }
-                    break;
-
                 case "plats":
                     return delar[0];
                 case "fordon":
@@ -454,6 +401,30 @@ namespace PragueParkering
                     }
             }
             return "FEL I FORDONSPLIT";
+        }
+        static string HelaFordonEllerSplittadDel(string fullString, string del, string register) //Tar ett en hel sträng för ett komplett fordon och delar upp det sen returnerar det användaren vill ha.
+        {
+            int plats = int.Parse(HelaFordonEllerSplittadDel(fullString, "plats"));
+            string mcA = string.Empty;
+            string mcB = string.Empty;
+            string[] deladMC = fullString.Split('|');
+            if (del == "separera mc")
+            {
+                foreach (var s in deladMC)
+                {
+                    if (s.Contains(register))
+                    {
+                        mcA = s;
+                    }
+                    else if (!s.Contains(register))
+                    {
+                        mcB = s;
+                    }
+                }
+                ParkeringsGaragePlatser[plats] = mcB;
+                return mcA;
+            }
+            return string.Empty;
         }
         static int HittaParkering(int plats, string fordon)// Kollar på parkering åt bil eller mc, mc som ska kombineras får +1000 för identifiering 
         {
@@ -533,6 +504,47 @@ namespace PragueParkering
 
             }
         }
+        static string HämtaFordonOmDetStämmer(string register) // meny för att kolla fordon
+        {
+            if (string.IsNullOrWhiteSpace(register) || register.Contains(" "))
+            {
+                //Switch som jämför ditt val samt data med aktiv data
+                string val = PromptSelectionMedVal("Ditt register var inte giltigt eller null, Vill du försöka igen?", ["Ja", "Nej"]);
+                switch (val)
+                {
+                    case "Ja":
+                        Console.Clear();
+                        while (true)
+                        {
+                            Console.WriteLine("Skriv ditt register");
+                            register = Console.ReadLine();
+                            if (register != null && register.Length < 10)
+                                break;
+                            else if (register == string.Empty)
+                                return string.Empty;
+                            Console.WriteLine("Fel inmatning max 10 tecken, Lämna tomt för gå tillbaka");
+                        }
+                        break;
+                    case "Nej":
+                        Console.Clear();
+                        return string.Empty;
+                }
+            }
+            else if (register != null)
+            {
+
+                int index = Array.FindIndex(ParkeringsGaragePlatser, p => p != null && p.Contains(register));
+                if (index == -1)
+                    return string.Empty;
+                string? fordon = HämtaFordonOmDetStämmer(index + 1);
+                if (fordon.Contains("|"))
+                {
+                    fordon = PreSplit(fordon, "ta ut specifik mc", register);
+                }
+                return fordon;
+            }
+            return string.Empty;
+        }
         static string HämtaFordonOmDetStämmer(int plats) // Hämta fordon via plats# 
         {
             if (ParkeringsGaragePlatser[plats - 1] == null)
@@ -601,6 +613,12 @@ namespace PragueParkering
             {
                 return string.Empty;
             }
+        }
+
+        static string PreSplit(string fullString, string del, string register) // gjordes för att hitta fel under krasch men jag tror den är onödig.
+        {
+            string a = HelaFordonEllerSplittadDel(fullString, del, register);
+            return a;
         }
         static void FlyttaMellanTvåPlatser(int plats1, int plats2, string fordon)//flyttar ett fordon till en ny plats
         {
